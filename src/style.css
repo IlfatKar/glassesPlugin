@@ -1,9 +1,13 @@
+/*TODO: CHECK ALL FONTS*/
+/*TODO: Поправить стили на первой странице (цвет в similar и 100% на камеру)*/
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
 }
 #virtual-mirror-widget{
   width: 750px;
@@ -11,9 +15,11 @@
   margin: 25px auto;
   border: 1px solid #ccc;
   border-radius: 12px;
+  background-color: #F6F6F6;
+}
+.fs{
   display: grid;
   grid-template-rows: 70% 30%;
-  background-color: #F6F6F6;
 }
 #top{
   display: grid;
@@ -45,9 +51,7 @@
   font-weight: 700;
   margin-bottom: 7px;
 }
-p{
-  font-family: 'Open Sans', sans-serif;
-}
+
 .fs12{
   font-size: 12px;
 }
@@ -59,6 +63,9 @@ p{
 }
 .fs18{
   font-size: 18px;
+}
+.fs20{
+  font-size: 20px;
 }
 #camera .text p{
   margin-bottom: 9px;
@@ -109,7 +116,7 @@ p{
   position: absolute;
   top: 160px;
   left: 115px;
-  transform: scale(.7);
+  /*transform: scale(.7);*/
 }
 .fulldescr{
   line-height: 16px;
@@ -150,5 +157,190 @@ p{
 .glass p{
   text-align: center;
   color: #4d4d4d;
+  cursor: pointer;
+}
+
+#secondscreen{
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  background-color: #fff;
+  height: 100%;
+}
+
+#ssleft{
+  display: grid;
+  grid-template-rows: 70% 30%;
+}
+
+#ssleft #camera{
+  height: 100%;
+  border-radius: 12px;
+}
+#ssleft .btns{
+  margin-top: 44px;
+  text-align: center;
+}
+#ssleft .btns .btn{
+  margin-bottom: 18px;
+  width: 220px;
+}
+#ssleft .btns a{
+  text-decoration: underline black;
+  cursor: pointer;
+}
+#ssright .aleft{
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  display: inline-block;
+}
+#ssright .backnav{
+  display: block;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: 28px;
+}
+#ssright .help{
+  width: 14px;
+  display: inline;
+  margin: 0;
+  cursor: pointer;
+  height: 14px;
+}
+#ssright input[type=number]{
+  width: 75px;
+  height: 40px;
+  padding: 13px;
+  color: #89959c;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #ADA7A7;
+  -moz-appearance: textfield;
+  margin-top: 16px;
+  margin-bottom: 37px;
+}
+#ssright li{
+  margin-bottom: 25px;
+  margin-left: 12px;
+}
+#ssright li:first-of-type{
+  margin-top: 32px;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+#ssright #info{
+  padding: 20px;
+}
+.photoSetting p{
+  margin-bottom: 11px;
+}
+
+input[type=range] {
+  height: 10px;
+  -webkit-appearance: none;
+  margin: 10px 0;
+  width: 100%;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #353535;
+  background: #000000;
+  border-radius: 5px;
+  border: 0px solid #806f3b;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #353535;
+  border: 0px solid #f3c846;
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  background: #000000;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: 0px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #000000;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #353535;
+  background: #DEDEDE;
+  border-radius: 5px;
+  border: 0px solid #806f3b;
+}
+input[type=range]::-moz-range-progress{
+  background: #000;
+  height: 100%;
+  border-radius: 50px;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 0px 0px 0px #353535;
+  border: 0px solid #f3c846;
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  background: #000000;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  animate: 0.2s;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #000000;
+  border: 0px solid #806f3b;
+  border-radius: 50px;
+  box-shadow: 0px 0px 0px #353535;
+}
+input[type=range]::-ms-fill-upper {
+  background: #000000;
+  border: 0px solid #806f3b;
+  border-radius: 50px;
+  box-shadow: 0px 0px 0px #353535;
+}
+input[type=range]::-ms-thumb {
+  margin-top: 1px;
+  box-shadow: 0px 0px 0px #000;
+  border: 0px solid #000;
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  background: #000000;
+  cursor: pointer;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #000000;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #000000;
+}
+
+.x1{
+  position: absolute;
+  top: 185px;
+  left: 195px;
+  cursor: pointer;
+}
+.x2{
+  position: absolute;
+  top: 185px;
+  left: 285px;
   cursor: pointer;
 }
