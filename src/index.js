@@ -1,5 +1,6 @@
 // TODO: PHOTO FROM BACKGROUND TO IMG
 // TODO: PHOTO SIZE & PHOTO ROTATION
+// TODO: FIX GLASSES POSITION & SCALE
 
 !function() {
   const firstScreen = `
