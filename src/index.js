@@ -6,11 +6,14 @@
   const firstScreen = `
   <div id="top">
     <div id="camera">
-      <img class="mirrorglass" src="../assets/img/mirrortmp2.png" alt="mirror">
-      <div class="btn btn-upload">
-        <img src="../assets/img/Camera.svg" alt="camera">
-        <p class="title fs12">Upload</p>
-      </div>
+    <div class="content">
+    <div class="camerabg"></div>
+       <img class="mirrorglass" src="../assets/img/mirrortmp3.png" alt="mirror">
+    </div>
+    <div class="btn btn-upload" id="upload-btn">
+      <img src="../assets/img/Camera.svg" alt="camera">
+      <p class="title fs12">Upload</p>
+    </div>
     </div>
     <div id="info">
       <p class="fs18 title">
@@ -60,20 +63,27 @@
           </p>
         </div>`
   const cameraScreen = `
+      <div class="content">
+      <div class="camerabg"></div>
          <img class="mirrorglass" src="../assets/img/mirrortmp3.png" alt="mirror">
+      </div>
       <div class="btn btn-upload" id="upload-btn">
         <img src="../assets/img/Camera.svg" alt="camera">
         <p class="title fs12">Upload</p>
-      </div>`
+      </div>
+      `
   const secondScreen = `<div id="secondscreen">
     <div id="ssleft">
       <div id="camera">
+      <div class="content">
+        <div class="camerabg"></div>
          <img draggable="false" class="eye x1" src="../assets/img/x.svg" alt="x">
          <img draggable="false" class="eye x2" src="../assets/img/x.svg" alt="x">
-        <div class="btn btn-upload">
-          <img src="../assets/img/Camera.svg" alt="camera">
-          <p class="title fs12">Retake</p>
         </div>
+        <div class="btn btn-upload">
+        <img src="../assets/img/Camera.svg" alt="camera">
+        <p class="title fs12">Retake</p>
+      </div>
       </div>
       <div class="btns">
         <div class="fs16 btn title try-btn">Try On Glasses</div>
@@ -95,9 +105,9 @@
           </ol>
           <div class="photoSetting">
             <p>Photo size:</p>
-            <input class="photosize" type="range">
+            <input class="photosize" min="50" max="200" value="100" type="range">
             <p>Photo rotation:</p>
-            <input class="photorotate" type="range">
+            <input class="photorotate" min="0" max="360" value="0" type="range">
           </div>
 
         </div>
@@ -135,13 +145,16 @@
       errFlag = true
     })
     if (errFlag) {
-      document.querySelector('#camera').style.background = "#F6F6F6"
+      document.querySelector('#camerabg').style.background = "#F6F6F6"
     }
-    if(meta){
+    if(Object.keys(meta).length !== 0){
       const glass = document.querySelector('.mirrorglass')
       glass.style.transform = `scale(${meta.scale}, ${meta.scale})`
       glass.style.left = meta.x + 'px'
       glass.style.top = meta.y + 'px'
+      const camerabg = document.querySelector(".camerabg")
+      camerabg.style.backgroundSize = meta.photoScale + "%"
+      camerabg.style.transform = `rotate(${meta.photoRotate}deg)`
     }
   }
 
@@ -152,6 +165,18 @@
     moveEyeDots()
     const tryBtn = document.querySelector('.try-btn')
     const backBtn = document.querySelector('.backnav')
+    const pSize = document.querySelector(".photosize")
+    const pRotate = document.querySelector(".photorotate")
+    const camerabg = document.querySelector(".camerabg")
+    let photoScale = 100, photoRotate = 0
+    pSize.addEventListener("input", () => {
+      photoScale = pSize.value
+      camerabg.style.backgroundSize = photoScale + "%"
+    })
+    pRotate.addEventListener("input", () => {
+      photoRotate = pRotate.value
+      camerabg.style.transform = `rotate(${photoRotate}deg)`
+    })
     tryBtn.addEventListener('click', () => {
       const frameWidth = 135
       const frameImageWidth = 172
@@ -169,16 +194,17 @@
       const distanceBetweenPupilsMarks = (() => {
         const eyes = document.querySelectorAll('.eye')
         x = eyes[0].x + eyes[0].width / 2 
-        y = eyes[0].y 
+        y = eyes[0].y - eyes[0].height / 3
         return eyes[1].x - eyes[0].x
       })()
       const scale = (frameWidth / frameImageWidth) / (pd / distanceBetweenPupilsMarks)
       x -= (frameImageWidth * scale - distanceBetweenPupilsMarks) / 2
-      fScreen(ref, {scale, x,y})
+      fScreen(ref, {scale, x,y, photoScale, photoRotate})
     })
     backBtn.addEventListener('click', () => {
       fScreen(ref)
     })
+    
   }
   function moveEyeDots() {
     const eyes = document.querySelectorAll('.eye')
