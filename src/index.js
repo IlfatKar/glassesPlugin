@@ -139,7 +139,7 @@
     }
     if(meta){
       const glass = document.querySelector('.mirrorglass')
-      glass.style.transform = `size(${meta.scale})`
+      glass.style.transform = `scale(${meta.scale}, ${meta.scale})`
       glass.style.left = meta.x + 'px'
       glass.style.top = meta.y + 'px'
     }
@@ -168,12 +168,12 @@
       let x = 0, y = 0
       const distanceBetweenPupilsMarks = (() => {
         const eyes = document.querySelectorAll('.eye')
-        x = eyes[0].x
-        y = eyes[0].y - eyes[0].height / 2
+        x = eyes[0].x + eyes[0].width / 2 
+        y = eyes[0].y 
         return eyes[1].x - eyes[0].x
       })()
       const scale = (frameWidth / frameImageWidth) / (pd / distanceBetweenPupilsMarks)
-      x -= (frameImageWidth * scale - distanceBetweenPupilsMarks * scale ) / 2
+      x -= (frameImageWidth * scale - distanceBetweenPupilsMarks) / 2
       fScreen(ref, {scale, x,y})
     })
     backBtn.addEventListener('click', () => {
