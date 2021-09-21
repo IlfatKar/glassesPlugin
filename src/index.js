@@ -1,6 +1,4 @@
-// TODO: PHOTO FROM BACKGROUND TO IMG
-// TODO: PHOTO SIZE & PHOTO ROTATION
-// TODO: FIX GLASSES POSITION & SCALE
+// TODO: fix govnocode
 
 !function() {
   const firstScreen = `
@@ -54,6 +52,7 @@
   </div>
 `
   const allowError = `
+  <div id="camerabg"></div>
         <div class="text">
           <p class="fs18 title caccess">
             Allow camera access
@@ -193,9 +192,9 @@
       let x = 0, y = 0
       const distanceBetweenPupilsMarks = (() => {
         const eyes = document.querySelectorAll('.eye')
-        x = eyes[0].x + eyes[0].width / 2 
-        y = eyes[0].y - eyes[0].height / 3
-        return eyes[1].x - eyes[0].x
+        x = parseInt(getComputedStyle(eyes[0]).left) + parseInt(getComputedStyle(eyes[0]).width) / 2 
+        y = parseInt(getComputedStyle(eyes[0]).top) - parseInt(getComputedStyle(eyes[0]).height) / 3
+        return parseInt(getComputedStyle(eyes[1]).left) - parseInt(getComputedStyle(eyes[0]).left)
       })()
       const scale = (frameWidth / frameImageWidth) / (pd / distanceBetweenPupilsMarks)
       x -= (frameImageWidth * scale - distanceBetweenPupilsMarks) / 2
@@ -210,7 +209,7 @@
     const eyes = document.querySelectorAll('.eye')
     eyes.forEach(item => {
       item.addEventListener("mousedown", ev => {
-        const delta = ev.clientX - ev.target.x- ev.target.offsetWidth / 2;
+        const delta = ev.clientX -  parseInt(getComputedStyle(ev.target).left)- ev.target.offsetWidth / 2;
         function move(e){
           ev.target.style.left = e.clientX - delta - ev.target.offsetWidth / 2  + 'px'
           ev.target.style.top = e.clientY - ev.target.offsetHeight  + 'px'
