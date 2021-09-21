@@ -1,4 +1,5 @@
 // TODO: fix govnocode
+// TODO: select glass from similar
 
 !function() {
   const firstScreen = `
@@ -115,6 +116,8 @@
     </div>
   </div>`
   let screen = 1
+  let serverData = {}
+  let currentGlass = {}
   addEventListener('DOMContentLoaded', async () => {
     await init()
   })
@@ -124,6 +127,13 @@
       console.error("ERROR: No element with 'virtual-mirror-widget' id")
       return
     }
+	try{
+		const res = await fetch('https://optimaxdev.github.io/volga-it/response.json')
+		serverData = await res.json()
+		currentGlass = serverData.items[3]
+	} catch(e){
+		console.error(e.message)
+	}
     await fScreen(ref)
   }
 
@@ -143,7 +153,18 @@
       cameraEl.innerHTML = allowError
       errFlag = true
     })
-    if (errFlag) {
+	const glasses = document.querySelectorAll(".glass")
+	glasses.forEach((glass, i) => {
+		glass.children[0].src = serverData.items[i].image
+		glass.children[1].textContent = serverData.items[i].name
+	})
+	const mirrorglass = document.querySelector(".mirrorglass")
+	mirrorglass.src = currentGlass.mirror_frame
+	currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
+	document.querySelector("#info .title").textContent = currentGlass.name
+	document.querySelector("#info img").src = currentGlass.image
+	document.querySelector("#info .fulldescr").textContent = currentGlass.description
+	if (errFlag) {
       document.querySelector('#camerabg').style.background = "#F6F6F6"
     }
     if(Object.keys(meta).length !== 0){
@@ -177,8 +198,8 @@
       camerabg.style.transform = `rotate(${photoRotate}deg)`
     })
     tryBtn.addEventListener('click', () => {
-      const frameWidth = 135
-      const frameImageWidth = 172
+      const frameWidth = currentGlass.width
+      const frameImageWidth = currentGlass.imageWidth
       const pd = (() => {
         const input = document.querySelector('.pd')
         if(input.value){
@@ -222,10 +243,3 @@
     })
   }
 }()
-
-// fetch('https://optimaxdev.github.io/volga-it/response.json')
-//     .then(res => res.json())
-//     .then(data => {
-//       console.log(data)
-//     })
-
