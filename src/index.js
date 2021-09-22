@@ -1,13 +1,12 @@
 // TODO: fix govnocode
 // TODO: select glass from similar
 
-!function() {
+!function () {
   const firstScreen = `
   <div id="top">
     <div id="camera">
     <div class="content">
     <div class="camerabg"></div>
-       <img class="mirrorglass" src="../assets/img/mirrortmp3.png" alt="mirror">
     </div>
     <div class="btn btn-upload" id="upload-btn">
       <img src="../assets/img/Camera.svg" alt="camera">
@@ -121,19 +120,20 @@
   addEventListener('DOMContentLoaded', async () => {
     await init()
   })
+
   async function init() {
     const ref = document.getElementById('virtual-mirror-widget')
     if (!ref) {
-      console.error("ERROR: No element with 'virtual-mirror-widget' id")
+      console.error('ERROR: No element with \'virtual-mirror-widget\' id')
       return
     }
-	try{
-		const res = await fetch('https://optimaxdev.github.io/volga-it/response.json')
-		serverData = await res.json()
-		currentGlass = serverData.items[3]
-	} catch(e){
-		console.error(e.message)
-	}
+    try {
+      const res = await fetch('https://optimaxdev.github.io/volga-it/response.json')
+      serverData = await res.json()
+      currentGlass = serverData.items[3]
+    } catch (e) {
+      console.error(e.message)
+    }
     await fScreen(ref)
   }
 
@@ -142,7 +142,7 @@
     ref.innerHTML = firstScreen
     ref.classList.add('fs')
     let errFlag = false
-    const cameraEl = document.querySelector("#camera")
+    const cameraEl = document.querySelector('#camera')
     await navigator.mediaDevices.getUserMedia({audio: true}).then(item => {
       cameraEl.innerHTML = cameraScreen
       const uploadBtn = document.querySelector('#upload-btn')
@@ -153,27 +153,35 @@
       cameraEl.innerHTML = allowError
       errFlag = true
     })
-	const glasses = document.querySelectorAll(".glass")
-	glasses.forEach((glass, i) => {
-		glass.children[0].src = serverData.items[i].image
-		glass.children[1].textContent = serverData.items[i].name
-	})
-	const mirrorglass = document.querySelector(".mirrorglass")
-	mirrorglass.src = currentGlass.mirror_frame
-	currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
-	document.querySelector("#info .title").textContent = currentGlass.name
-	document.querySelector("#info img").src = currentGlass.image
-	document.querySelector("#info .fulldescr").textContent = currentGlass.description
-	if (errFlag) {
-      document.querySelector('#camerabg').style.background = "#F6F6F6"
+    const glasses = document.querySelectorAll('.glass')
+    glasses.forEach((glass, i) => {
+      if (glass.name === currentGlass.name) ++i
+      glass.children[0].src = serverData.items[i].image
+      glass.children[1].textContent = serverData.items[i].name
+      glass.dataset.glassidx = i
+      glass.addEventListener('click', ev => {
+        currentGlass = serverData.items[ev.target.closest('.glass').dataset.glassidx]
+        currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
+        mirrorglass.src = currentGlass.mirror_frame
+        sScreen(ref)
+      })
+    })
+    const mirrorglass = document.querySelector('.mirrorglass')
+    mirrorglass.src = currentGlass.mirror_frame
+    currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
+    document.querySelector('#info .title').textContent = currentGlass.name
+    document.querySelector('#info img').src = currentGlass.image
+    document.querySelector('#info .fulldescr').textContent = currentGlass.description
+    if (errFlag) {
+      document.querySelector('#camerabg').style.background = '#F6F6F6'
     }
-    if(Object.keys(meta).length !== 0){
+    if (Object.keys(meta).length !== 0) {
       const glass = document.querySelector('.mirrorglass')
       glass.style.transform = `scale(${meta.scale}, ${meta.scale})`
       glass.style.left = meta.x + 'px'
       glass.style.top = meta.y + 'px'
-      const camerabg = document.querySelector(".camerabg")
-      camerabg.style.backgroundSize = meta.photoScale + "%"
+      const camerabg = document.querySelector('.camerabg')
+      camerabg.style.backgroundSize = meta.photoScale + '%'
       camerabg.style.transform = `rotate(${meta.photoRotate}deg)`
     }
   }
@@ -185,56 +193,64 @@
     moveEyeDots()
     const tryBtn = document.querySelector('.try-btn')
     const backBtn = document.querySelector('.backnav')
-    const pSize = document.querySelector(".photosize")
-    const pRotate = document.querySelector(".photorotate")
-    const camerabg = document.querySelector(".camerabg")
+    const pSize = document.querySelector('.photosize')
+    const pRotate = document.querySelector('.photorotate')
+    const camerabg = document.querySelector('.camerabg')
     let photoScale = 100, photoRotate = 0
-    pSize.addEventListener("input", () => {
+    pSize.addEventListener('input', () => {
       photoScale = pSize.value
-      camerabg.style.backgroundSize = photoScale + "%"
+      camerabg.style.backgroundSize = photoScale + '%'
     })
-    pRotate.addEventListener("input", () => {
+    pRotate.addEventListener('input', () => {
       photoRotate = pRotate.value
       camerabg.style.transform = `rotate(${photoRotate}deg)`
     })
     tryBtn.addEventListener('click', () => {
-      const frameWidth = currentGlass.width
-      const frameImageWidth = currentGlass.imageWidth
-      const pd = (() => {
-        const input = document.querySelector('.pd')
-        if(input.value){
-          if(input.value < 30) {
-            return 30
-        }
-          return input.value
-        }
-        return 62
-      })()
-      let x = 0, y = 0
-      const distanceBetweenPupilsMarks = (() => {
-        const eyes = document.querySelectorAll('.eye')
-        x = parseInt(getComputedStyle(eyes[0]).left) + parseInt(getComputedStyle(eyes[0]).width) / 2 
-        y = parseInt(getComputedStyle(eyes[0]).top) - parseInt(getComputedStyle(eyes[0]).height) / 3
-        return parseInt(getComputedStyle(eyes[1]).left) - parseInt(getComputedStyle(eyes[0]).left)
-      })()
-      const scale = (frameWidth / frameImageWidth) / (pd / distanceBetweenPupilsMarks)
-      x -= (frameImageWidth * scale - distanceBetweenPupilsMarks) / 2
-      fScreen(ref, {scale, x,y, photoScale, photoRotate})
+      const {scale, x, y} = getScale()
+      fScreen(ref, {scale, x, y})
     })
     backBtn.addEventListener('click', () => {
       fScreen(ref)
     })
-    
+
   }
+
+  function getScale() {
+    const frameWidth = currentGlass.width
+    const frameImageWidth = currentGlass.imageWidth
+    const pd = (() => {
+      const input = document.querySelector('.pd')
+      if (input.value) {
+        if (input.value < 30) {
+          return 30
+        }
+        return input.value
+      }
+      return 62
+    })()
+    let x = 0, y = 0
+    const distanceBetweenPupilsMarks = (() => {
+      const eyes = document.querySelectorAll('.eye')
+      x = parseInt(getComputedStyle(eyes[0]).left) + parseInt(getComputedStyle(eyes[0]).width) / 2
+      y = parseInt(getComputedStyle(eyes[0]).top) - parseInt(getComputedStyle(eyes[0]).height) / 3
+      return parseInt(getComputedStyle(eyes[1]).left) - parseInt(getComputedStyle(eyes[0]).left)
+    })()
+    const scale = (frameWidth / frameImageWidth) / (pd / distanceBetweenPupilsMarks)
+    x -= (frameImageWidth * scale - distanceBetweenPupilsMarks) / 2
+    return {scale, x, y}
+  }
+
   function moveEyeDots() {
     const eyes = document.querySelectorAll('.eye')
     eyes.forEach(item => {
-      item.addEventListener("mousedown", ev => {
-        const delta = ev.clientX -  parseInt(getComputedStyle(ev.target).left)- ev.target.offsetWidth / 2;
-        function move(e){
-          ev.target.style.left = e.clientX - delta - ev.target.offsetWidth / 2  + 'px'
-          ev.target.style.top = e.clientY - ev.target.offsetHeight  + 'px'
+      item.addEventListener('mousedown', ev => {
+        const delta = ev.clientX - parseInt(getComputedStyle(ev.target).left) - ev.target.offsetWidth / 2
+
+        function move(e) {
+          ev.target.style.left = e.clientX - delta - ev.target.offsetWidth / 2 + 'px'
+          ev.target.style.top = e.clientY - ev.target.offsetHeight + 'px'
         }
+
         document.addEventListener('mousemove', move)
         document.addEventListener('mouseup', (e) => {
           document.removeEventListener('mousemove', move)

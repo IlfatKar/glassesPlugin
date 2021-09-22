@@ -125,6 +125,10 @@
 .btn-upload p{
   margin: 0;
 }
+.eye{
+  user-select: none;
+}
+
 .mirrorglass{
   position: absolute;
   top: 160px;
