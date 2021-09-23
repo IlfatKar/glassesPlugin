@@ -1,5 +1,4 @@
 /*TODO: CHECK ALL FONTS*/
-/*TODO: Поправить стили на первой странице (цвет в similar и 100% на камеру)*/
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
@@ -45,13 +44,28 @@
   width: 100%;
 }
 .camerabg{
+  display: flex;
+  vertical-align: center;
   position: absolute;
   top: 0;
   left: 0;
-  background: url("../assets/img/face.png") no-repeat center;
   background-size: 100%;
+  background-repeat: no-repeat;
+  background-position:center ;
   height: 100%;
   width: 100%;
+}
+.camerabg video{
+  height: 100%;
+  width: 100%;
+}
+.camerabg canvas{
+  left: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  margin: auto;
 }
 
 #info{
@@ -117,7 +131,7 @@
   width: 100px;
   background-color: #fff;
   color: #000;
-  bottom: -20px;
+  bottom: -35px;
   margin: 0;
   z-index: 101;
   left: calc(50% - 100px / 2);
@@ -127,19 +141,20 @@
 }
 .eye{
   user-select: none;
+  z-index: 100;
 }
 
 .mirrorglass{
   position: absolute;
   top: 160px;
   left: 115px;
-  /*transform: scale(.7);*/
   transform-origin: top left; 
 }
 .fulldescr{
   line-height: 16px;
   color: #2d2d2d;
   margin-left: 3px;
+  height: 80px;
 }
 .descr{
   margin-right: 30px;
@@ -151,7 +166,7 @@
   border-radius: 10px 0 12px 12px;
 }
 #similar .glasses{
-  margin: -15px 45px 7px 45px;
+  margin: -25px 45px 7px 45px;
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr 1fr 1fr;
@@ -260,19 +275,13 @@ input[type=range] {
   -webkit-appearance: none;
   margin: 10px 0;
   width: 100%;
+  background: linear-gradient(to right, green 0%, green 50%, #fff 50%, #fff 100%);
+  transition: background 450ms ease-in;
+  outline: none;
+  border-radius: 50px;
 }
 input[type=range]:focus {
   outline: none;
-}
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 10px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 0px 0px 0px #353535;
-  background: #000000;
-  border-radius: 5px;
-  border: 0px solid #806f3b;
 }
 input[type=range]::-webkit-slider-thumb {
   box-shadow: 0px 0px 0px #353535;
@@ -283,11 +292,8 @@ input[type=range]::-webkit-slider-thumb {
   background: #000000;
   cursor: pointer;
   -webkit-appearance: none;
-  margin-top: 0px;
 }
-input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #000000;
-}
+
 input[type=range]::-moz-range-track {
   width: 100%;
   height: 10px;
@@ -303,6 +309,7 @@ input[type=range]::-moz-range-progress{
   height: 100%;
   border-radius: 50px;
 }
+
 input[type=range]::-moz-range-thumb {
   box-shadow: 0px 0px 0px #353535;
   border: 0px solid #f3c846;

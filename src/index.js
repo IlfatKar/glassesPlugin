@@ -1,6 +1,3 @@
-// TODO: fix govnocode
-// TODO: select glass from similar
-
 !function () {
   const firstScreen = `
   <div id="top">
@@ -17,7 +14,7 @@
       <p class="fs18 title">
         Ray-Ban 3545V
       </p>
-      <img src="../assets/img/tmp.jpg"/>
+      <img src=""/>
       <div class="title fs16 btn">
         Choose Lenses
       </div>
@@ -37,16 +34,16 @@
     <p class="title fs16">Similar Frames</p>
     <div class="glasses">
       <div class="glass">
-        <img src="../assets/img/tmp.jpg" alt="glass">
-        <p>Ray-Ban 3545V</p>
+        <img src="" alt=" ">
+        <p></p>
       </div>
       <div class="glass">
-        <img src="../assets/img/tmp.jpg" alt="glass">
-        <p>Ray-Ban 3545V</p>
+        <img src="" alt="  ">
+        <p></p>
       </div>
       <div class="glass">
-        <img src="../assets/img/tmp.jpg" alt="glass">
-        <p>Ray-Ban 3545V</p>
+        <img src="" alt=" ">
+        <p></p>
       </div>
     </div>
   </div>
@@ -63,8 +60,10 @@
         </div>`
   const cameraScreen = `
       <div class="content">
-      <div class="camerabg"></div>
-         <img class="mirrorglass" src="../assets/img/mirrortmp3.png" alt="mirror">
+      <div class="camerabg">
+        <video src=""></video>
+      </div>
+         <img class="mirrorglass" src="" alt=" ">
       </div>
       <div class="btn btn-upload" id="upload-btn">
         <img src="../assets/img/Camera.svg" alt="camera">
@@ -75,7 +74,9 @@
     <div id="ssleft">
       <div id="camera">
       <div class="content">
-        <div class="camerabg"></div>
+        <div class="camerabg">
+          <canvas></canvas>
+        </div>
          <img draggable="false" class="eye x1" src="../assets/img/x.svg" alt="x">
          <img draggable="false" class="eye x2" src="../assets/img/x.svg" alt="x">
         </div>
@@ -92,7 +93,7 @@
     <div id="ssright">
       <div id="info" class="ssInfo">
         <div>
-          <p class="backnav fs14 title"><img class="aleft" src="../assets/img/arrow_left.svg" alt=""> Back</p>
+          <p class="backnav fs14 title"><img class="aleft" src="../assets/img/arrow_left.svg" alt=" "> Back</p>
           <p class="title fs20">Adjust the Image</p>
           <ol class="fs14">
             <li>Drag the RED targets to the center of your eyes.</li>
@@ -104,7 +105,7 @@
           </ol>
           <div class="photoSetting">
             <p>Photo size:</p>
-            <input class="photosize" min="50" max="200" value="100" type="range">
+            <input class="photosize" min="0" max="200" value="100" type="range">
             <p>Photo rotation:</p>
             <input class="photorotate" min="0" max="360" value="0" type="range">
           </div>
@@ -143,11 +144,32 @@
     ref.classList.add('fs')
     let errFlag = false
     const cameraEl = document.querySelector('#camera')
-    await navigator.mediaDevices.getUserMedia({audio: true}).then(item => {
+    await navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
       cameraEl.innerHTML = cameraScreen
       const uploadBtn = document.querySelector('#upload-btn')
+      const videoEl = cameraEl.querySelector('video')
+      if(!meta.img){
+        videoEl.srcObject = stream
+        videoEl.play()
+      } else {
+        uploadBtn.children[1].textContent = "Retake"
+      }
+      const mirrorglass = document.querySelector('.mirrorglass')
+      mirrorglass.src = currentGlass.mirror_frame
+      mirrorglass.style.width = "100%"
+      currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
+      if(!meta.show){
+        mirrorglass.style.opacity = "0"
+      } else {
+        mirrorglass.style.opacity = "100"
+      }
       uploadBtn.addEventListener('click', () => {
-        sScreen(ref)
+        if(!meta.img){
+          videoEl.pause()
+          sScreen(ref, videoEl)
+        } else {
+          fScreen(ref)
+        }
       })
     }).catch(err => {
       cameraEl.innerHTML = allowError
@@ -155,20 +177,18 @@
     })
     const glasses = document.querySelectorAll('.glass')
     glasses.forEach((glass, i) => {
-      if (glass.name === currentGlass.name) ++i
       glass.children[0].src = serverData.items[i].image
       glass.children[1].textContent = serverData.items[i].name
       glass.dataset.glassidx = i
       glass.addEventListener('click', ev => {
         currentGlass = serverData.items[ev.target.closest('.glass').dataset.glassidx]
+        serverData.items = serverData.items.filter(item => item.name !== currentGlass.name)
+        serverData.items.push(currentGlass)
         currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
         mirrorglass.src = currentGlass.mirror_frame
-        sScreen(ref)
+        fScreen(ref)
       })
     })
-    const mirrorglass = document.querySelector('.mirrorglass')
-    mirrorglass.src = currentGlass.mirror_frame
-    currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
     document.querySelector('#info .title').textContent = currentGlass.name
     document.querySelector('#info img').src = currentGlass.image
     document.querySelector('#info .fulldescr').textContent = currentGlass.description
@@ -181,33 +201,47 @@
       glass.style.left = meta.x + 'px'
       glass.style.top = meta.y + 'px'
       const camerabg = document.querySelector('.camerabg')
+      camerabg.style.backgroundImage = `url(${meta.img})`
       camerabg.style.backgroundSize = meta.photoScale + '%'
       camerabg.style.transform = `rotate(${meta.photoRotate}deg)`
     }
   }
 
-  function sScreen(ref) {
+  function sScreen(ref, video = null) {
     screen = 2
     ref.innerHTML = secondScreen
+    const canvas = document.querySelector('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(video, 0, 0)
     ref.classList.remove('fs')
     moveEyeDots()
     const tryBtn = document.querySelector('.try-btn')
     const backBtn = document.querySelector('.backnav')
     const pSize = document.querySelector('.photosize')
     const pRotate = document.querySelector('.photorotate')
+    pSize.style.background = 'linear-gradient(to right, black 0%, black '+ pSize.value / 200 * 100 +'%, #DEDEDE '+ pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
+    pRotate.style.background = 'linear-gradient(to right, black 0%, black '+ pRotate.value / 360 * 100 +'%, #DEDEDE '+ pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
     const camerabg = document.querySelector('.camerabg')
+    const retakeBtn = document.querySelector('.btn-upload')
     let photoScale = 100, photoRotate = 0
     pSize.addEventListener('input', () => {
+      pSize.style.background = 'linear-gradient(to right, black 0%, black '+ pSize.value / 200 * 100 +'%, #DEDEDE '+ pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
       photoScale = pSize.value
-      camerabg.style.backgroundSize = photoScale + '%'
+      canvas.style.transform = `scale(${photoScale}%)`
     })
     pRotate.addEventListener('input', () => {
+      pRotate.style.background = 'linear-gradient(to right, black 0%, black '+ pRotate.value / 360 * 100 +'%, #DEDEDE '+ pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
       photoRotate = pRotate.value
       camerabg.style.transform = `rotate(${photoRotate}deg)`
     })
+    retakeBtn.addEventListener('click', () => {
+      fScreen(ref)
+    })
     tryBtn.addEventListener('click', () => {
       const {scale, x, y} = getScale()
-      fScreen(ref, {scale, x, y})
+      fScreen(ref, {scale, x, y, img: canvas.toDataURL(), show: true, photoRotate, photoScale})
     })
     backBtn.addEventListener('click', () => {
       fScreen(ref)
@@ -258,4 +292,10 @@
       })
     })
   }
+
+  // $( '.chrome input' ).on( 'input', function( ) {
+  //   $( this ).css( 'background', 'linear-gradient(to right, green 0%, green '+this.value +'%, #fff ' + this.value + '%, white 100%)' );
+  // } );
+
+
 }()
