@@ -77,8 +77,8 @@
         <div class="camerabg">
           <canvas></canvas>
         </div>
-         <img draggable="false" class="eye x1" src="../assets/img/x.svg" alt="x">
-         <img draggable="false" class="eye x2" src="../assets/img/x.svg" alt="x">
+         <img draggable="false" ondrag="return false" ondragdrop="return false" ondragstart="return false"  class="eye x1" src="../assets/img/x.svg" alt="x">
+         <img draggable="false" ondrag="return false" ondragdrop="return false" ondragstart="return false"  class="eye x2" src="../assets/img/x.svg" alt="x">
         </div>
         <div class="btn btn-upload">
         <img src="../assets/img/Camera.svg" alt="camera">
@@ -144,27 +144,28 @@
     ref.classList.add('fs')
     let errFlag = false
     const cameraEl = document.querySelector('#camera')
+    let mirrorglass = null
     await navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
       cameraEl.innerHTML = cameraScreen
       const uploadBtn = document.querySelector('#upload-btn')
       const videoEl = cameraEl.querySelector('video')
-      if(!meta.img){
+      if (!meta.img) {
         videoEl.srcObject = stream
         videoEl.play()
       } else {
-        uploadBtn.children[1].textContent = "Retake"
+        uploadBtn.children[1].textContent = 'Retake'
       }
-      const mirrorglass = document.querySelector('.mirrorglass')
+      mirrorglass = document.querySelector('.mirrorglass')
       mirrorglass.src = currentGlass.mirror_frame
-      mirrorglass.style.width = "100%"
+      mirrorglass.style.width = '100%'
       currentGlass.imageWidth = parseInt(getComputedStyle(mirrorglass).width)
-      if(!meta.show){
-        mirrorglass.style.opacity = "0"
+      if (!meta.show) {
+        mirrorglass.style.opacity = '0'
       } else {
-        mirrorglass.style.opacity = "100"
+        mirrorglass.style.opacity = '100'
       }
       uploadBtn.addEventListener('click', () => {
-        if(!meta.img){
+        if (!meta.img) {
           videoEl.pause()
           sScreen(ref, videoEl)
         } else {
@@ -210,29 +211,33 @@
   function sScreen(ref, video = null) {
     screen = 2
     ref.innerHTML = secondScreen
+
     const canvas = document.querySelector('canvas')
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     const ctx = canvas.getContext('2d')
     ctx.drawImage(video, 0, 0)
+
     ref.classList.remove('fs')
+
     moveEyeDots()
+
     const tryBtn = document.querySelector('.try-btn')
     const backBtn = document.querySelector('.backnav')
     const pSize = document.querySelector('.photosize')
     const pRotate = document.querySelector('.photorotate')
-    pSize.style.background = 'linear-gradient(to right, black 0%, black '+ pSize.value / 200 * 100 +'%, #DEDEDE '+ pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
-    pRotate.style.background = 'linear-gradient(to right, black 0%, black '+ pRotate.value / 360 * 100 +'%, #DEDEDE '+ pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
+    pSize.style.background = 'linear-gradient(to right, black 0%, black ' + pSize.value / 200 * 100 + '%, #DEDEDE ' + pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
+    pRotate.style.background = 'linear-gradient(to right, black 0%, black ' + pRotate.value / 360 * 100 + '%, #DEDEDE ' + pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
     const camerabg = document.querySelector('.camerabg')
     const retakeBtn = document.querySelector('.btn-upload')
     let photoScale = 100, photoRotate = 0
     pSize.addEventListener('input', () => {
-      pSize.style.background = 'linear-gradient(to right, black 0%, black '+ pSize.value / 200 * 100 +'%, #DEDEDE '+ pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
+      pSize.style.background = 'linear-gradient(to right, black 0%, black ' + pSize.value / 200 * 100 + '%, #DEDEDE ' + pSize.value / 200 * 100 + '%, #DEDEDE 100%)'
       photoScale = pSize.value
       canvas.style.transform = `scale(${photoScale}%)`
     })
     pRotate.addEventListener('input', () => {
-      pRotate.style.background = 'linear-gradient(to right, black 0%, black '+ pRotate.value / 360 * 100 +'%, #DEDEDE '+ pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
+      pRotate.style.background = 'linear-gradient(to right, black 0%, black ' + pRotate.value / 360 * 100 + '%, #DEDEDE ' + pRotate.value / 360 * 100 + '%, #DEDEDE 100%)'
       photoRotate = pRotate.value
       camerabg.style.transform = `rotate(${photoRotate}deg)`
     })
@@ -246,7 +251,6 @@
     backBtn.addEventListener('click', () => {
       fScreen(ref)
     })
-
   }
 
   function getScale() {
@@ -276,26 +280,51 @@
 
   function moveEyeDots() {
     const eyes = document.querySelectorAll('.eye')
-    eyes.forEach(item => {
-      item.addEventListener('mousedown', ev => {
-        const delta = ev.clientX - parseInt(getComputedStyle(ev.target).left) - ev.target.offsetWidth / 2
 
-        function move(e) {
-          ev.target.style.left = e.clientX - delta - ev.target.offsetWidth / 2 + 'px'
-          ev.target.style.top = e.clientY - ev.target.offsetHeight + 'px'
+    function moveEvent(type = 'mouse', client, target) {
+      const delta = client.clientX - parseInt(getComputedStyle(target).left) - target.offsetWidth / 2
+      const content = target.closest('.content')
+      const maxWidth = content.offsetWidth
+      const maxHeight = content.offsetHeight
+
+      function move(e) {
+        let resX, resY
+        if (type === 'mouse') {
+          resX = e.clientX - delta - client.target.offsetWidth / 2
+          resY = e.clientY - client.target.offsetHeight
+        } else {
+          resX = e.touches[0].clientX - delta - client.target.offsetWidth / 2
+          resY = e.touches[0].clientY - client.target.offsetHeight
         }
+        if (resX >= 0 && resX <= maxWidth - target.offsetWidth) {
+          target.style.left = resX + 'px'
+        }
+        if (resY >= 0 && resY <= maxHeight - target.offsetHeight) {
+          target.style.top = resY + 'px'
+        }
+      }
 
+      if (type === 'mouse') {
         document.addEventListener('mousemove', move)
         document.addEventListener('mouseup', (e) => {
           document.removeEventListener('mousemove', move)
         })
+      } else {
+        document.addEventListener('touchmove', move)
+        document.addEventListener('touchend', (e) => {
+          document.removeEventListener('touchmove', move)
+        })
+      }
+    }
+
+    eyes.forEach(item => {
+      item.addEventListener('mousedown', ev => {
+        moveEvent('mouse', ev, ev.target)
+      })
+      item.addEventListener('touchstart', ev => {
+        ev.preventDefault()
+        moveEvent('touch', ev.touches[0], ev.target)
       })
     })
   }
-
-  // $( '.chrome input' ).on( 'input', function( ) {
-  //   $( this ).css( 'background', 'linear-gradient(to right, green 0%, green '+this.value +'%, #fff ' + this.value + '%, white 100%)' );
-  // } );
-
-
 }()
